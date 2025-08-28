@@ -1,5 +1,7 @@
 import { LitElement, html, css } from "https://esm.run/lit";
 import { employeeStore } from "../store/employeeStore.js";
+import "../components/delete-confirm-popup.js";
+import "../components/pagination.js";
 
 export class EmployeeList extends LitElement {
   static styles = css`
@@ -101,11 +103,30 @@ export class EmployeeList extends LitElement {
 
   static properties = {
     employees: { type: Array },
+    currentPage: { type: Number },
+    pageSize: { type: Number },
   };
 
   constructor() {
     super();
     this.employees = [];
+    this.currentPage = 1;
+    this.pageSize = 10;
+  }
+
+  get paginatedEmployees() {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.employees.slice(start, start + this.pageSize);
+  }
+
+  get totalPages() {
+    return Math.ceil(this.employees.length / this.pageSize);
+  }
+
+  changePage(page) {
+    console.log("page",page);
+    
+    this.currentPage = page;
   }
 
   connectedCallback() {
@@ -124,16 +145,6 @@ export class EmployeeList extends LitElement {
     if (this.unsubscribe) this.unsubscribe();
   }
 
-  handleCheckboxChange(employee, event) {
-    this.dispatchEvent(
-      new CustomEvent("employee-select", {
-        detail: { employee, selected: event.target.checked },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
   handleEdit(employee) {
     this.dispatchEvent(
       new CustomEvent("employee-edit", {
@@ -145,9 +156,18 @@ export class EmployeeList extends LitElement {
   }
 
   handleDelete(employee) {
-    employeeStore.getState().removeEmployee(employee.id);
+  const popup = document.createElement("delete-confirm-popup");
 
-  }
+  popup.firstName = employee.firstName;
+  popup.lastName = employee.lastName;
+
+  popup.addEventListener("confirm-delete", () => {
+    employeeStore.getState().removeEmployee(employee.id);
+  });
+
+  document.body.appendChild(popup);
+}
+
 
   render() {
     return html`
@@ -155,7 +175,6 @@ export class EmployeeList extends LitElement {
         <table class="table">
           <thead>
             <tr>
-              <th></th>
               <th>First Name</th>
               <th>Last Name</th>
               <th>Date of Employment</th>
@@ -168,16 +187,9 @@ export class EmployeeList extends LitElement {
             </tr>
           </thead>
           <tbody>
-            ${(this.employees ?? []).map(
+            ${(this.paginatedEmployees).map(
               (employee) => html`
                 <tr>
-                  <td>
-                    <input
-                      type="checkbox"
-                      class="checkbox"
-                      @change="${(e) => this.handleCheckboxChange(employee, e)}"
-                    />
-                  </td>
                   <td>${employee.firstName}</td>
                   <td>${employee.lastName}</td>
                   <td>${employee.dateOfEmployment}</td>
@@ -217,6 +229,12 @@ export class EmployeeList extends LitElement {
             )}
           </tbody>
         </table>
+        <custom-pagination
+          .currentPage="${this.currentPage}"
+          .totalPages="${this.totalPages}"
+          @page-change="${(e) => this.changePage(e.detail.page)}"
+        >
+        </custom-pagination>
       </div>
     `;
   }
