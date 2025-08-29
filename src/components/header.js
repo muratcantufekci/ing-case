@@ -124,8 +124,8 @@ export class Header extends LitElement {
           Employees
         </a>
         <a
-          href="/add-new.html"
-          class="header__item ${this.isActive("add-new") ? "active" : ""}"
+          href="/add-employee.html"
+          class="header__item ${this.isActive("add-employee") ? "active" : ""}"
         >
           <svg
             width="800px"

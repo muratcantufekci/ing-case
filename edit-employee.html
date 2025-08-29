@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees</title>
+    <link rel="stylesheet" href="./src/assets/styles/main.css">
+    <script type="module" src="./src/components/header.js"></script>
+    <script type="module" src="./src/components/add-employee.js"></script>
+</head>
+<body>
+    <custom-header></custom-header>
+    <div class="page">
+        <div class="container">
+            <h3>Edit Employee</h3>
+            <add-employee id="edit-employee"></add-employee>
+        </div>
+    </div>
+</body>
+<script type="module">
+    const addEmployee = document.getElementById("edit-employee");
+    const employeeId = new URLSearchParams(window.location.search).get("id");
+    if (employeeId) {
+        addEmployee.employeeId = Number(employeeId);
+        addEmployee.isEditing = true;
+    }
+</script>
+</html>

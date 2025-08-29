@@ -146,13 +146,7 @@ export class EmployeeList extends LitElement {
   }
 
   handleEdit(employee) {
-    this.dispatchEvent(
-      new CustomEvent("employee-edit", {
-        detail: { employee },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    window.location.href = `/edit-employee.html?id=${employee.id}`;
   }
 
   handleDelete(employee) {
