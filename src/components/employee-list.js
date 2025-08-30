@@ -40,13 +40,13 @@ export class EmployeeList extends LitElement {
 
     h1 {
       color: #ff6101;
-      font-size: 24px;
+      font-size: 20px;
     }
 
     .employee-list__grid {
       display: none;
       flex-wrap: wrap;
-      gap: 50px;
+      gap: 20px;
     }
 
     .employee-list__grid--active {
@@ -54,11 +54,11 @@ export class EmployeeList extends LitElement {
     }
 
     .employee-list__grid-item {
-      width: 45%;
+      width: 100%;
       background: white;
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      padding: 20px;
+      padding: 14px;
     }
 
     .employee-list__grid-row {
@@ -78,7 +78,7 @@ export class EmployeeList extends LitElement {
     }
 
     .employee-list__grid-field p {
-      font-size: 18px;
+      font-size: 16px;
       color: black;
       margin: 4px 0 0 0;
     }
@@ -114,11 +114,11 @@ export class EmployeeList extends LitElement {
       background: white;
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      display: table;
+      display: block;
+      overflow-x: scroll;
     }
-
     .table--hidden {
-      display: none;
+      display: none !important;
     }
 
     .table thead {
@@ -178,21 +178,38 @@ export class EmployeeList extends LitElement {
       height: 18px;
     }
 
-    @media (max-width: 768px) {
+    @media (min-width: 768px) {
+      h1 {
+        font-size: 24px;
+      }
+
+      .employee-list__grid {
+        gap: 50px;
+      }
+
+      .employee-list__grid-item {
+        width: 40%;
+        padding: 20px;
+      }
+    }
+
+    @media (min-width: 1024px) {
       .table {
-        font-size: 12px;
+        display: table;
       }
 
-      .table th,
-      .table td {
-        padding: 8px;
+      .employee-list__grid-item {
+        width: 43%;
       }
 
-      .table th:nth-child(4),
-      .table td:nth-child(4),
-      .table th:nth-child(5),
-      .table td:nth-child(5) {
-        display: none;
+      .employee-list__grid-field p {
+        font-size: 18px;
+      }
+    }
+
+    @media (min-width: 1440px) {
+      .employee-list__grid-item {
+        width: 45%;
       }
     }
   `;

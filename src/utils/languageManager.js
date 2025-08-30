@@ -23,7 +23,8 @@ const keywords = {
     employeeUpdated: "Çalışan başarıyla güncellendi",
     employeeDeleted: "Çalışan başarıyla silindi",
     selectPosition: "Pozisyon Seçiniz",
-    addEmployee: "Çalışan Ekle"
+    addEmployee: "Çalışan Ekle",
+    editEmployee: "Çalışanı Düzenle"
   },
 
   en: {
@@ -50,7 +51,8 @@ const keywords = {
     employeeUpdated: "Employee updated successfully",
     employeeDeleted: "Employee deleted successfully",
     selectPosition: "Select Position",
-    addEmployee: "Add Employee"
+    addEmployee: "Add Employee",
+    editEmployee: "Edit Employee"
   },
 };
 

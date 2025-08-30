@@ -26,7 +26,7 @@ a {
 }
 
 .container {
-    padding: 30px;
+    padding: 20px;
 }
 
 .page {
@@ -35,5 +35,16 @@ a {
 
 h3 {
     color: #ff6101;
+    font-size: 20px;
+}
+
+
+@media (min-width: 768px) {
+  .container {
+    padding: 30px;
+  }
+
+  h3 {
     font-size: 24px;
+  }
 }

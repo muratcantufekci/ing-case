@@ -21,6 +21,7 @@ export class DeleteConfirmPopup extends LitElement {
       padding: 24px;
       border-radius: 8px;
       min-width: 300px;
+      width: 80%;
     }
 
     .popup__head {
@@ -78,6 +79,12 @@ export class DeleteConfirmPopup extends LitElement {
 
     .popup__cancel:hover {
       background: #f5f5f5;
+    }
+
+    @media (min-width: 768px) {
+      .popup {
+        width: 100%;
+      }
     }
   `;
 

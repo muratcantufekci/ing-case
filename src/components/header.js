@@ -17,14 +17,14 @@ export class Header extends LitElement {
     }
 
     .header__img {
-      width: 40px;
-      height: 40px;
+      width: 30px;
+      height: 30px;
     }
 
     .header__left {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 10px;
       font-weight: 600;
       text-decoration: none;
       color: black;
@@ -33,19 +33,20 @@ export class Header extends LitElement {
     .header__right {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 4px;
     }
 
     .header__item {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       text-decoration: none;
       color: #ff6101;
       opacity: 0.7;
-      padding: 8px 12px;
+      padding: 4px;
       border-radius: 6px;
       transition: all 0.2s ease;
+      font-size: 12px;
     }
 
     .header__item:hover {
@@ -57,8 +58,8 @@ export class Header extends LitElement {
     }
 
     .header__item svg {
-      width: 30px;
-      height: 30px;
+      width: 20px;
+      height: 20px;
     }
 
     .header__language {
@@ -68,9 +69,9 @@ export class Header extends LitElement {
     .header__language-trigger {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
-      padding: 8px 12px;
+      padding: 6px;
       border-radius: 6px;
       transition: all 0.2s ease;
       border: none;
@@ -174,6 +175,36 @@ export class Header extends LitElement {
 
     .header__language-trigger--open::after {
       transform: rotate(180deg);
+    }
+
+    @media (min-width: 768px) {
+      .header__img {
+        width: 40px;
+        height: 40px;
+      }
+
+      .header__left {
+        gap: 20px;
+      }
+
+      .header__right {
+        gap: 10px;
+      }
+
+      .header__item {
+        padding: 8px 12px;
+        font-size: 16px;
+      }
+
+      .header__item svg {
+        width: 30px;
+        height: 30px;
+      }
+
+      .header__language-trigger {
+        gap: 8px;
+        padding: 8px 12px;
+      }
     }
   `;
 

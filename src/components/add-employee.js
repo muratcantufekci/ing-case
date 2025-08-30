@@ -20,13 +20,13 @@ export class AddEmployee extends LitElement {
   static styles = css`
     .add-employee {
       background: white;
-      padding: 40px 40px 120px;
-      margin-top: 40px;
+      padding: 20px;
+      margin-top: 20px;
     }
 
     .add-employee__title {
       color: #ff6101;
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 600;
       margin-bottom: 20px;
     }
@@ -34,14 +34,14 @@ export class AddEmployee extends LitElement {
     .add-employee__wrapper {
       display: flex;
       flex-wrap: wrap;
-      gap: 65px;
+      gap: 20px;
     }
 
     .add-employee__input {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      width: 30%;
+      width: 100%;
     }
 
     .add-employee__input label {
@@ -50,7 +50,7 @@ export class AddEmployee extends LitElement {
     }
 
     .add-employee__input input {
-      width: 60%;
+      width: 94%;
       height: 30px;
       padding: 8px;
       border: 1px solid #ddd;
@@ -58,8 +58,8 @@ export class AddEmployee extends LitElement {
     }
 
     .add-employee__input select {
-      width: 60%;
-      height: 36px;
+      width: 100%;
+      height: 48px;
       padding: 8px;
       border: 1px solid #ddd;
       border-radius: 4px;
@@ -100,6 +100,44 @@ export class AddEmployee extends LitElement {
 
     .add-employee__cancel:hover {
       background: #f5f5f5;
+    }
+
+    @media (min-width: 768px) {
+      .add-employee {
+        background: white;
+        padding: 40px 40px 120px;
+        margin-top: 40px;
+      }
+
+      .add-employee__title {
+        font-size: 24px;
+      }
+
+      .add-employee__wrapper {
+        gap: 50px;
+      }
+
+      .add-employee__input {
+        width: 45%;
+      }
+    }
+
+    @media (min-width: 1440px) {
+      .add-employee__wrapper {
+        gap: 65px;
+      }
+
+      .add-employee__input {
+        width: 30%;
+      }
+
+      .add-employee__input input {
+        width: 60%;
+      }
+
+      .add-employee__input select {
+        width: 60%;
+      }
     }
   `;
 
