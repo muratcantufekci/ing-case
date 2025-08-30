@@ -1,5 +1,6 @@
 import { LitElement, html, css } from "https://esm.run/lit";
 import { employeeStore } from "../store/employeeStore.js";
+import { t, subscribe, getCurrentLanguage } from "../utils/languageManager.js";
 
 export class AddEmployee extends LitElement {
   static properties = {
@@ -13,6 +14,7 @@ export class AddEmployee extends LitElement {
     position: { type: String },
     employeeId: { type: Number, reflect: true },
     isEditing: { type: Boolean, reflect: true },
+    currentLanguage: { type: String },
   };
 
   static styles = css`
@@ -21,25 +23,48 @@ export class AddEmployee extends LitElement {
       padding: 40px 40px 120px;
       margin-top: 40px;
     }
+
+    .add-employee__title {
+      color: #ff6101;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
     .add-employee__wrapper {
       display: flex;
       flex-wrap: wrap;
       gap: 65px;
     }
+
     .add-employee__input {
       display: flex;
       flex-direction: column;
       gap: 8px;
       width: 30%;
     }
+
+    .add-employee__input label {
+      font-weight: 500;
+      color: #333;
+    }
+
     .add-employee__input input {
       width: 60%;
       height: 30px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
     }
+
     .add-employee__input select {
       width: 60%;
       height: 36px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
     }
+
     .add-employee__buttons {
       display: flex;
       align-items: center;
@@ -47,21 +72,34 @@ export class AddEmployee extends LitElement {
       gap: 50px;
       margin-top: 60px;
     }
+
     button {
       padding: 8px 16px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
       width: 200px;
+      font-weight: 500;
+      transition: all 0.2s ease;
     }
+
     .add-employee__save {
       background: #ff6101;
       color: white;
     }
+
+    .add-employee__save:hover {
+      background: #e55000;
+    }
+
     .add-employee__cancel {
       background: white;
       color: black;
       border: 1px solid black;
+    }
+
+    .add-employee__cancel:hover {
+      background: #f5f5f5;
     }
   `;
 
@@ -76,6 +114,25 @@ export class AddEmployee extends LitElement {
     this.department = "";
     this.position = "";
     this.isEditing = false;
+    this.currentLanguage = getCurrentLanguage();
+    this.languageUnsubscribe = null;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    this.languageUnsubscribe = subscribe((language) => {
+      this.currentLanguage = language;
+      this.requestUpdate();
+    });
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+
+    if (this.languageUnsubscribe) {
+      this.languageUnsubscribe();
+    }
   }
 
   updated(changedProps) {
@@ -113,10 +170,13 @@ export class AddEmployee extends LitElement {
         department: formData.get("department"),
         position: formData.get("position"),
       });
-      alert("Employee güncellendi!");
+      alert(t("employeeUpdated"));
     } else {
       const currentEmployees = employeeStore.getState().employees;
-      const newId = Math.max(...currentEmployees.map((emp) => emp.id)) + 1;
+      const newId =
+        currentEmployees.length > 0
+          ? Math.max(...currentEmployees.map((emp) => emp.id)) + 1
+          : 1;
 
       const newEmployee = {
         id: newId,
@@ -131,43 +191,55 @@ export class AddEmployee extends LitElement {
       };
 
       employeeStore.getState().addEmployee(newEmployee);
-      alert(
-        `Employee eklendi: ${newEmployee.firstName} ${newEmployee.lastName}`
-      );
+      alert(t("employeeAdded"));
     }
 
     e.target.reset();
     window.location.href = "/employees.html";
   }
 
+  getPositionOptions() {
+    return [
+      { value: "", text: t("selectPosition") || "Select Position" },
+      { value: "Junior", text: "Junior" },
+      { value: "Mid", text: "Mid" },
+      { value: "Senior", text: "Senior" },
+    ];
+  }
+
   render() {
+    const positionOptions = this.getPositionOptions();
+
     return html`
       <div class="add-employee">
+        <h2 class="add-employee__title">
+          ${this.isEditing ? t("editEmployee") : t("addEmployee")}
+        </h2>
+
         <form @submit=${(e) => this.formPostHandler(e)}>
-        ${this.isEditing ? html`<h5>You are editing ${this.firstName} ${this.lastName}</h5>` : ""}
           <div class="add-employee__wrapper">
             <div class="add-employee__input">
-              <span>First Name</span>
+              <label>${t("firstName")}</label>
               <input
                 type="text"
                 name="firstName"
                 .value="${this.firstName}"
-                placeholder="Enter your first name"
+                placeholder="${t("firstName")}"
                 required
               />
             </div>
             <div class="add-employee__input">
-              <span>Last Name</span>
+              <label>${t("lastName")}</label>
               <input
                 type="text"
                 name="lastName"
                 .value="${this.lastName}"
-                placeholder="Enter your last name"
+                placeholder="${t("lastName")}"
                 required
               />
             </div>
             <div class="add-employee__input">
-              <span>Date of Employment</span>
+              <label>${t("dateOfEmployment")}</label>
               <input
                 type="date"
                 name="dateOfEmployment"
@@ -176,7 +248,7 @@ export class AddEmployee extends LitElement {
               />
             </div>
             <div class="add-employee__input">
-              <span>Date of Birth</span>
+              <label>${t("dateOfBirth")}</label>
               <input
                 type="date"
                 name="dateOfBirth"
@@ -185,55 +257,63 @@ export class AddEmployee extends LitElement {
               />
             </div>
             <div class="add-employee__input">
-              <span>Phone</span>
+              <label>${t("phone")}</label>
               <input
                 type="tel"
                 name="phone"
                 .value="${this.phone}"
-                placeholder="Enter your phone number"
+                placeholder="${t("phone")}"
                 pattern="(05[0-9]{2}(?: [0-9]{2,4}){4}|0[0-9]{3}(?: [0-9]{2,4}){3}|[0-9]{10}|[0-9]{3}(?: [0-9]{2,4}){3})"
-                title="Geçerli formatlar: 05357456609, 0535 745 6609, 5357456609, 535 745 6609"
+                title="phone"
                 required
               />
             </div>
             <div class="add-employee__input">
-              <span>Email</span>
+              <label>${t("email")}</label>
               <input
                 type="email"
                 name="email"
                 .value="${this.email}"
-                placeholder="Enter your email"
+                placeholder="${t("email")}"
                 required
               />
             </div>
             <div class="add-employee__input">
-              <span>Department</span>
+              <label>${t("department")}</label>
               <input
                 type="text"
                 name="department"
                 .value="${this.department}"
-                placeholder="Enter your department"
+                placeholder="${t("department")}"
                 required
               />
             </div>
             <div class="add-employee__input">
-              <span>Position</span>
+              <label>${t("position")}</label>
               <select name="position" .value="${this.position}" required>
-                <option value="" disabled selected hidden>Seçiniz</option>
-                <option value="Junior">Junior</option>
-                <option value="Mid">Mid</option>
-                <option value="Senior">Senior</option>
+                ${positionOptions.map(
+                  (option) => html`
+                    <option
+                      value="${option.value}"
+                      ?selected="${this.position === option.value}"
+                    >
+                      ${option.text}
+                    </option>
+                  `
+                )}
               </select>
             </div>
           </div>
           <div class="add-employee__buttons">
-            <button class="add-employee__save" type="submit">Save</button>
+            <button class="add-employee__save" type="submit">
+              ${t("save")}
+            </button>
             <button
               class="add-employee__cancel"
               type="button"
               @click=${() => (window.location.href = "/employees.html")}
             >
-              Cancel
+              ${t("cancel")}
             </button>
           </div>
         </form>

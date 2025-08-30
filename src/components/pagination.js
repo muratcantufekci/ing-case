@@ -13,6 +13,7 @@ export class CustomPagination extends LitElement {
       gap: 12px;
       margin: 16px 0;
     }
+
     button {
       border: none;
       border-radius: 100%;
@@ -21,14 +22,17 @@ export class CustomPagination extends LitElement {
       cursor: pointer;
       background: transparent;
     }
+
     button:disabled {
       opacity: 0.5;
       cursor: default;
     }
+
     button.active {
       background-color: #ff6101;
       color: white;
     }
+      
     .pagination-next {
         transform: rotate(180deg);
     }
@@ -41,8 +45,6 @@ export class CustomPagination extends LitElement {
   }
 
   handleChangePage(page) {
-    console.log("sfas");
-
     if (page < 1 || page > this.totalPages) return;
     this.dispatchEvent(
       new CustomEvent("page-change", {

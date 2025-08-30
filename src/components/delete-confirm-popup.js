@@ -1,4 +1,5 @@
 import { LitElement, html, css } from "https://esm.run/lit";
+import { t, subscribe, getCurrentLanguage } from "../utils/languageManager.js";
 
 export class DeleteConfirmPopup extends LitElement {
   static styles = css`
@@ -38,6 +39,12 @@ export class DeleteConfirmPopup extends LitElement {
       font-size: 24px;
     }
 
+    .popup__desc {
+      margin: 16px 0;
+      color: #333;
+      line-height: 1.5;
+    }
+
     .popup__buttons {
       display: flex;
       flex-direction: column;
@@ -50,6 +57,8 @@ export class DeleteConfirmPopup extends LitElement {
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
     }
 
     .popup__confirm {
@@ -57,22 +66,50 @@ export class DeleteConfirmPopup extends LitElement {
       color: white;
     }
 
+    .popup__confirm:hover {
+      background: #e55000;
+    }
+
     .popup__cancel {
       background: white;
       color: black;
       border: 1px solid black;
+    }
+
+    .popup__cancel:hover {
+      background: #f5f5f5;
     }
   `;
 
   static properties = {
     firstName: { type: String },
     lastName: { type: String },
+    currentLanguage: { type: String },
   };
 
   constructor() {
     super();
     this.firstName = "";
     this.lastName = "";
+    this.currentLanguage = getCurrentLanguage();
+    this.languageUnsubscribe = null;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    this.languageUnsubscribe = subscribe((language) => {
+      this.currentLanguage = language;
+      this.requestUpdate();
+    });
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+
+    if (this.languageUnsubscribe) {
+      this.languageUnsubscribe();
+    }
   }
 
   handleCancel() {
@@ -90,7 +127,7 @@ export class DeleteConfirmPopup extends LitElement {
     return html`
       <div class="popup">
         <div class="popup__head">
-          <span class="popup__title">Are you sure?</span>
+          <span class="popup__title">${t("deleteConfirmation")}</span>
           <div class="popup__head-icon" @click="${() => this.remove()}">
             <svg
               width="50px"
@@ -107,15 +144,15 @@ export class DeleteConfirmPopup extends LitElement {
           </div>
         </div>
         <p class="popup__desc">
-          Selected Employee record of
-          <strong>${this.firstName} ${this.lastName}</strong> will be deleted
+          ${t("deleteMessage")}
+          <strong>${this.firstName} ${this.lastName}</strong>
         </p>
         <div class="popup__buttons">
           <button class="popup__confirm" @click="${this.handleConfirm}">
-            Proceed
+            ${t("confirm")}
           </button>
           <button class="popup__cancel" @click="${this.handleCancel}">
-            Cancel
+            ${t("cancel")}
           </button>
         </div>
       </div>

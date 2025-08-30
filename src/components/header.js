@@ -1,4 +1,10 @@
 import { LitElement, html, css } from "https://esm.run/lit";
+import {
+  t,
+  subscribe,
+  getCurrentLanguage,
+  setLanguage,
+} from "../utils/languageManager.js";
 
 export class Header extends LitElement {
   static styles = css`
@@ -19,10 +25,9 @@ export class Header extends LitElement {
       display: flex;
       align-items: center;
       gap: 20px;
-    }
-
-    .header__left span {
       font-weight: 600;
+      text-decoration: none;
+      color: black;
     }
 
     .header__right {
@@ -56,15 +61,174 @@ export class Header extends LitElement {
       height: 30px;
     }
 
-    .header__flag img {
-      width: 30px;
-      height: 30px;
+    .header__language {
+      position: relative;
+    }
+
+    .header__language-trigger {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      border: none;
+      background: none;
+    }
+
+    .header__language-trigger:hover {
+      background-color: #f5f5f5;
+    }
+
+    .header__language-trigger img {
+      width: 24px;
+      height: 24px;
       object-fit: contain;
+    }
+
+    .header__language-trigger span {
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .header__language-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      min-width: 160px;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.2s ease;
+    }
+
+    .header__language-dropdown--open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .header__language-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .header__language-option:hover {
+      background-color: #f8f9fa;
+    }
+
+    .header__language-option:first-child {
+      border-radius: 8px 8px 0 0;
+    }
+
+    .header__language-option:last-child {
+      border-radius: 0 0 8px 8px;
+    }
+
+    .header__language-option img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+
+    .header__language-option span {
+      font-size: 14px;
+      color: #333;
+    }
+
+    .header__language-option--active {
+      background-color: #fff8f5;
+      color: #ff6101;
+    }
+
+    .header__language-option--active span {
+      color: #ff6101;
+      font-weight: 600;
+    }
+
+    /* Dropdown arrow */
+    .header__language-trigger::after {
+      content: "";
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 4px solid #666;
+      transition: transform 0.2s ease;
+    }
+
+    .header__language-trigger--open::after {
+      transform: rotate(180deg);
     }
   `;
 
+  static properties = {
+    currentLanguage: { type: String },
+    dropdownOpen: { type: Boolean },
+  };
+
   constructor() {
     super();
+    this.currentLanguage = getCurrentLanguage();
+    this.dropdownOpen = false;
+    this.handleClickOutside = this.handleClickOutside.bind(this);
+    this.languageUnsubscribe = null;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    document.addEventListener("click", this.handleClickOutside);
+
+    this.languageUnsubscribe = subscribe((language) => {
+      this.currentLanguage = language;
+      this.requestUpdate();
+    });
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    document.removeEventListener("click", this.handleClickOutside);
+
+    if (this.languageUnsubscribe) {
+      this.languageUnsubscribe();
+    }
+  }
+
+  handleClickOutside(event) {
+    if (
+      !this.shadowRoot.querySelector(".header__language").contains(event.target)
+    ) {
+      this.dropdownOpen = false;
+      this.requestUpdate();
+    }
+  }
+
+  toggleDropdown(event) {
+    event.stopPropagation();
+    this.dropdownOpen = !this.dropdownOpen;
+    this.requestUpdate();
+  }
+
+  selectLanguage(language, event) {
+    event.stopPropagation();
+    this.dropdownOpen = false;
+    setLanguage(language);
+    this.requestUpdate();
   }
 
   getCurrentPath() {
@@ -77,12 +241,29 @@ export class Header extends LitElement {
     return this.getCurrentPath() === itemId;
   }
 
+  getLanguageConfig() {
+    return {
+      tr: {
+        flag: "../../src/assets/images/turkish-flag.png",
+        name: "Türkçe",
+        code: "TR",
+      },
+      en: {
+        flag: "../../src/assets/images/english-flag.png",
+        name: "English",
+        code: "EN",
+      },
+    };
+  }
+
   render() {
+    const languageConfig = this.getLanguageConfig();
+
     return html`<div class="header">
-      <div class="header__left">
+      <a href="/" class="header__left">
         <img class="header__img" src="../../src/assets/images/logo.png" />
         <span>ING</span>
-      </div>
+      </a>
       <div class="header__right">
         <a
           href="/employees.html"
@@ -121,7 +302,7 @@ export class Header extends LitElement {
               </g>
             </g>
           </svg>
-          Employees
+          ${t("employees")}
         </a>
         <a
           href="/add-employee.html"
@@ -142,10 +323,42 @@ export class Header extends LitElement {
               stroke-linejoin="round"
             />
           </svg>
-          Add New
+          ${t("addNew")}
         </a>
-        <div class="header__flag">
-          <img src="../../src/assets/images/turkish-flag.png" />
+
+        <div class="header__language">
+          <button
+            class="header__language-trigger ${this.dropdownOpen
+              ? "header__language-trigger--open"
+              : ""}"
+            @click="${this.toggleDropdown}"
+          >
+            <img
+              src="${languageConfig[this.currentLanguage].flag}"
+              alt="${languageConfig[this.currentLanguage].name}"
+            />
+            <span>${languageConfig[this.currentLanguage].code}</span>
+          </button>
+
+          <div
+            class="header__language-dropdown ${this.dropdownOpen
+              ? "header__language-dropdown--open"
+              : ""}"
+          >
+            ${Object.entries(languageConfig).map(
+              ([code, config]) => html`
+                <button
+                  class="header__language-option ${this.currentLanguage === code
+                    ? "header__language-option--active"
+                    : ""}"
+                  @click="${(e) => this.selectLanguage(code, e)}"
+                >
+                  <img src="${config.flag}" alt="${config.name}" />
+                  <span>${config.name}</span>
+                </button>
+              `
+            )}
+          </div>
         </div>
       </div>
     </div>`;
