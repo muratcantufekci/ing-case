@@ -83,7 +83,7 @@ export class DeleteConfirmPopup extends LitElement {
 
     @media (min-width: 768px) {
       .popup {
-        width: 100%;
+        width: 40%;
       }
     }
   `;
